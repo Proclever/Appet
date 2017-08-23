@@ -1,0 +1,32 @@
+﻿@model Appet.Models.UserPet
+@{
+    ViewBag.Title = "Zaproś właściciela";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <h4>@Html.ActionLink("⇦", "PetDetails", "Home", routeValues: new { id = ViewBag.Pet_id }, htmlAttributes: new { @style = "font-weight:bold;" }) @Html.Raw(ViewBag.Message)</h4>
+        <hr />
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.id)
+        @Html.HiddenFor(model => model.pet_id)
+        @Html.HiddenFor(model => model.user_id)
+        <div class="form-group">
+            @Html.LabelFor(model => model.user_name, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.user_name)
+                @Html.ValidationMessageFor(model => model.user_name)
+            </div>
+        </div>
+        @Html.HiddenFor(model => model.user_email)
+        @Html.HiddenFor(model => model.ismain)
+        @Html.HiddenFor(model => model.isaccepted)
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Zaproś" class="btn btn-primary btn-md" />
+            </div>
+        </div>
+    </div>
+}

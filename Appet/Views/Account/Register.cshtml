@@ -1,0 +1,55 @@
+﻿@model Appet.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Zarejestruj się";
+}
+
+<div style="max-width:200px;margin:0 auto;margin-top:15px;margin-bottom:15px;">
+<img src="@Url.Content("~/Content/Images/logobig.png")" width="200px" />
+</div>
+<h2 style="text-align:center;">@ViewBag.Title</h2>
+
+@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    <hr />
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <div class="form-group" style="max-width:280px;margin:0 auto;margin-bottom:10px;">
+        @Html.LabelFor(m => m.Username, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group" style="max-width:280px;margin:0 auto;margin-bottom:10px;">
+        @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group" style="max-width:280px;margin:0 auto;margin-bottom:10px;">
+        @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group" style="max-width:280px;margin:0 auto;margin-bottom:15px;">
+        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6 col-lg-offset-5 col-md-offset-4 col-sm-offset-4 col-xs-offset-3">
+            <input type="submit" class="btn btn-primary btn-md" style="width:100%;font-weight:bold;" value="Zarejestruj się" />
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<hr />
+<footer>
+    <p style="text-align:center;">Appet &copy; @DateTime.Now.Year</p>
+    <p style="text-align:center;">Utworzone dla Ciebie przez <a href="http://proclever.pl"><strong>PROCLEVER</strong></a></p>
+</footer>

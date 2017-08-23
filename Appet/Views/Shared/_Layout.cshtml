@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="1800" />
+    <title>@ViewBag.Title - Appet</title>
+    <link rel="icon" href="@Url.Content("~/Content/Images/icon32-2.png")" />
+    <link rel="icon" href="@Url.Content("~/Content/Images/icon192-2.png")" />
+    <link rel="apple-touch-icon-precomposed" href="@Url.Content("~/Content/Images/icon180-2.png")" />
+    <meta name="msapplication-TileImage" content="@Url.Content("~/Content/Images/icon270-2.png")" />
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Appet", "Index", "Home", new { area = "" }, new { @class = "navbar-brand", @style = "background: url(" + @Url.Content("~/Content/Images/logomenu.png") + ") no-repeat;background-position:center;display:block;background-size:100%;width:150px;text-indent:-9999px;margin-left:5px;" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    @if (Request.IsAuthenticated && ViewBag.Menu!=null)
+                    {
+                        for (int i = 0; i < ViewBag.Menu.Length; i++)
+                        {
+                            string name = ViewBag.MenuS[i];
+                            if (name == null) { continue; }
+                            <li>@Html.ActionLink(name, "PetDetails", "Home", routeValues: new { id = ViewBag.Menu[i] }, htmlAttributes: null)</li>
+                        }
+                    }
+                    <!--<li>@Html.ActionLink("Tablica", "Index", "Pet")</li>
+                    <li>@Html.ActionLink("Utwórz pupila", "Index", "Pet")</li>
+                    <li>@Html.ActionLink("Zaproszenia", "Index", "Pet")</li>
+                    <li>@Html.ActionLink("Info", "Info", "Home")</li>-->
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+    <div style="float:right;padding-top:5px;padding-right:5px;">
+        <a href="javascript:location.reload(true)" style="font-size:32px">↻</a>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <!--<hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>-->
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

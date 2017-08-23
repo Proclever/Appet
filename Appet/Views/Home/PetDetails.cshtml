@@ -1,0 +1,176 @@
+﻿@model Appet.Models.Pet
+@{ 
+    var userid = ViewBag.Userid;
+}
+
+<h2>@Html.ActionLink("⇦", "Index", "Home", routeValues: null, htmlAttributes: new { @style = "font-weight:bold;" }) @Html.Raw(Model.name)</h2>
+@if (ViewBag.Message != "") { @Html.Raw("<p style=\"color:red;font-weight:bold;\">" + ViewBag.Message + "</p>") }
+<ul class="nav nav-tabs">
+    <li role="presentation" id="tab0"><a id="pr" onclick="tab(0);">Harmonogram</a></li>
+    <li role="presentation" id="tab1"><a id="pr" onclick="tab(1);">Notatki</a></li>
+    <li role="presentation" id="tab2"><a id="pr" onclick="tab(2);">Właściciele</a></li>
+</ul>
+<div id="Wlasciciele" style="display:none;margin-top:15px;">
+    <!--<h3>Właściciele</h3>-->
+    <div class="row">
+        
+        @{ bool ismain = false; if (Model.UserPet.Where(x => x.user_id == userid && x.ismain).Count() == 1) { ismain = true; } }
+        @if (ismain)
+        { <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6" style="padding-right:10px;padding-bottom:10px;">@Html.ActionLink("Zaproś użytkownika", "Invite", "Home", routeValues: new { id = Model.id }, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;" })</div><div class="col-lg-2 col-md-2 col-sm-3 col-xs-6" style="padding-right:10px;padding-bottom:10px;">@Html.ActionLink("Zmień nazwę pupila", "RenamePet", "Home", routeValues: new { id = Model.id }, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;" })</div><div class="col-lg-2 col-md-2 col-sm-3 col-xs-6" style="padding-right:10px;padding-bottom:10px;">@Html.ActionLink("Usuń pupila", "RemovePet", "Home", routeValues: new { id = Model.id }, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;;background-color:#a00000 !important;border-color:#80000 !important;" })</div> }
+        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6" style="padding-right:10px;padding-bottom:10px;">@Html.ActionLink("Opuść pupila", "CancelInv", "Home", routeValues: new { id = Model.UserPet.Where(x => x.user_id == userid).First().id, petid = Model.id }, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;background-color:#a00000 !important;border-color:#80000 !important;" })</div>
+    </div>
+    <p><strong>Główny właściciel:</strong> @if(ismain){@Html.Raw("<strong>")}@Html.Raw(Model.UserPet.Where(x => x.ismain).First().user_name)@if(ismain){@Html.Raw("</strong>")}</p>
+    @if (Model.UserPet.Where(x => x.ismain == false && x.isaccepted == true).Count() > 0)
+    {
+        <p><strong>Pozostali właściciele:</strong></p>
+            for (int i = 0; i < Model.UserPet.Where(x => x.ismain == false && x.isaccepted == true).Count(); i++)
+            {
+                <div class="row">
+                @{ bool ty = false; if (Model.UserPet.Where(x => x.ismain == false && x.isaccepted == true).ElementAt(i).user_id == userid) { ty = true;  } }
+                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-5" style="padding-right:5px;padding-bottom:5px;">@if(ty){ @Html.Raw("<strong>") }@Html.Raw(Model.UserPet.Where(x => x.ismain == false && x.isaccepted == true).ElementAt(i).user_name)@if(ty){ @Html.Raw("</strong>") }</div>
+                @if (Model.UserPet.Where(x => x.user_id == userid && x.ismain).Count() == 1)
+                { <div class="col-lg-2 col-md-2 col-sm-3 col-xs-5" style="padding-right:5px;padding-bottom:5px;">@Html.ActionLink("Ustaw jako głównego", "GiveMain", "Home", routeValues: new { id = Model.id, owner_id = Model.UserPet.Where(x => x.ismain == false && x.isaccepted == true).ElementAt(i).id }, htmlAttributes: new { @class = "btn btn-primary btn-xs", @style = "width:100%;" })</div><div class="col-lg-2 col-md-2 col-sm-3 col-xs-2" style="padding-right:5px;padding-bottom:5px;">@Html.ActionLink("Usuń", "RemoveOwner", "Home", routeValues: new { id = Model.UserPet.Where(x => x.ismain == false && x.isaccepted == true).ElementAt(i).id }, htmlAttributes: new { @class = "btn btn-primary btn-xs", @style = "width:100%;;background-color:#a00000 !important;border-color:#80000 !important;" })</div> }
+                
+                <br />
+                </div>
+            }
+    }
+    @if ((Model.UserPet.Where(x => x.user_id == userid && x.ismain).Count() == 1) && (Model.UserPet.Where(x => x.ismain == false && x.isaccepted == false).Count() > 0))
+    {
+        <p><strong>Wysłane zaproszenia:</strong></p>
+        for (int i = 0; i < Model.UserPet.Where(x => x.ismain == false && x.isaccepted == false).Count(); i++)
+        {
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6" style="padding-left:0px;padding-right:5px;padding-bottom:5px;">@Html.Raw(Model.UserPet.Where(x => x.ismain == false && x.isaccepted == false).ElementAt(i).user_name)</div><div class="col-lg-2 col-md-2 col-sm-3 col-xs-4" style="padding-right:5px;padding-bottom:5px;">@Html.ActionLink("Anuluj zaproszenie", "RemoveOwner", "Home", routeValues: new { id = Model.UserPet.Where(x => x.ismain == false && x.isaccepted == false).ElementAt(i).id }, htmlAttributes: new { @class = "btn btn-primary btn-xs", @style = "background-color:#a00000 !important;border-color:#80000 !important;" })</div>
+            <br />
+        }
+    }
+</div>
+<div id="Harmonogram" style="display:none;margin-top:15px;">
+    <!--<h3>Harmonogram</h3>-->
+    @{
+        var today = new List<DateTime>();
+        var yesterday = new List<DateTime>();
+        var twodaysago = new List<DateTime>();
+        var walk = Model.Walk.Where(x => x.datetime.AddHours(2).DayOfYear == DateTime.Now.AddHours(2).DayOfYear).OrderByDescending(x => x.datetime);
+        var walk_1 = Model.Walk.Where(x => x.datetime.AddHours(2).DayOfYear + 1 == DateTime.Now.AddHours(2).DayOfYear);
+        var walk_2 = Model.Walk.Where(x => x.datetime.AddHours(2).DayOfYear + 2 == DateTime.Now.AddHours(2).DayOfYear);
+        var eat = Model.Eat.Where(x => x.datetime.AddHours(2).DayOfYear == DateTime.Now.AddHours(2).DayOfYear).OrderByDescending(x => x.datetime);
+        var eat_1 = Model.Eat.Where(x => x.datetime.AddHours(2).DayOfYear + 1 == DateTime.Now.AddHours(2).DayOfYear);
+        var eat_2 = Model.Eat.Where(x => x.datetime.AddHours(2).DayOfYear + 2 == DateTime.Now.AddHours(2).DayOfYear);
+        for (int i = 0; i < walk.Count(); i++) { today.Add(walk.ElementAt(i).datetime.AddHours(2)); }
+        for (int i = 0; i < eat.Count(); i++) { today.Add(eat.ElementAt(i).datetime.AddHours(2)); }
+        for (int i = 0; i < walk_1.Count(); i++) { yesterday.Add(walk_1.ElementAt(i).datetime.AddHours(2)); }
+        for (int i = 0; i < eat_1.Count(); i++) { yesterday.Add(eat_1.ElementAt(i).datetime.AddHours(2)); }
+        for (int i = 0; i < walk_2.Count(); i++) { twodaysago.Add(walk_2.ElementAt(i).datetime.AddHours(2)); }
+        for (int i = 0; i < eat_2.Count(); i++) { twodaysago.Add(eat_2.ElementAt(i).datetime.AddHours(2)); }
+        today = today.OrderByDescending(x => x).ToList();
+        yesterday = yesterday.OrderByDescending(x => x).ToList();
+        twodaysago = twodaysago.OrderByDescending(x => x).ToList();
+
+        string hidewalk = "";
+        if (walk.Count() > 0 && walk.First().datetime.AddMinutes(30) > DateTime.Now) { hidewalk = "pointer-events: none;cursor: default;background-color: #808080 !important;border-color:#606060!important;"; }
+        string hideeat = "";
+        if (eat.Count() > 0 && eat.First().datetime.AddMinutes(30) > DateTime.Now) { hideeat = "pointer-events: none;cursor: default;background-color: #808080 !important;border-color:#606060!important;"; }
+    }
+    <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6" style="padding-right:10px;padding-bottom:10px;">@Html.ActionLink("Wyprowadź", "WalkNow", "Home", routeValues: new { action2 = "PetDetails", route = new { id = Model.id }, id = Model.id }, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;" + hidewalk })</div><div class="col-lg-2 col-md-2 col-sm-3 col-xs-6" style="padding-right:10px;padding-bottom:10px;">@Html.ActionLink("Nakarm", "EatNow", "Home", routeValues: new { action2 = "PetDetails", route = new { id = Model.id }, id = Model.id }, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;" + hideeat })</div>
+    </div>
+    @if(today.Count()>0) {<p><strong>Dziś</strong></p>}
+    @for (int i = 0; i<today.Count(); i++)
+    {
+        for(int j = 0; j<walk.Count(); j++)
+        {
+            if(today[i]==walk.ElementAt(j).datetime.AddHours(2))
+            { @Html.Raw(today[i].ToString("HH:mm") + ": Spacer z " + walk.ElementAt(j).user_name + " ") if (walk.ElementAt(j).user_id == userid && walk.ElementAt(j).datetime.AddMinutes(30) > DateTime.Now) { @Html.ActionLink("✘", "DelWalkNow", "Home", routeValues: new { id = walk.ElementAt(j).id, petid = Model.id }, htmlAttributes: new { @style = "color:#a00000;" }) } @Html.Raw("<br>") break; }            
+        }
+        for (int j = 0; j < eat.Count(); j++)
+        {
+            if (today[i] == eat.ElementAt(j).datetime.AddHours(2))
+            { @Html.Raw(today[i].ToString("HH:mm") + ": Karmienie z " + eat.ElementAt(j).user_name + " ") if (eat.ElementAt(j).user_id == userid && eat.ElementAt(j).datetime.AddMinutes(30) > DateTime.Now) { @Html.ActionLink("✘", "DelEatNow", "Home", routeValues: new { id = eat.ElementAt(j).id, petid = Model.id }, htmlAttributes: new { @style = "color:#a00000;" }) } @Html.Raw("<br>") break; }
+        }
+    }
+    @if(today.Count()>0) {<br />}
+    @if(yesterday.Count()>0) {<p><strong>Wczoraj</strong></p>}
+    @for (int i = 0; i < yesterday.Count(); i++)
+    {
+        for (int j = 0; j < walk_1.Count(); j++)
+        {
+            if (yesterday[i] == walk_1.ElementAt(j).datetime.AddHours(2))
+            { @Html.Raw(yesterday[i].ToString("HH:mm") + ": Spacer z " + walk_1.ElementAt(j).user_name + "<br>") break; }
+        }
+        for (int j = 0; j < eat_1.Count(); j++)
+        {
+            if (yesterday[i] == eat_1.ElementAt(j).datetime.AddHours(2))
+            { @Html.Raw(yesterday[i].ToString("HH:mm") + ": Karmienie z " + eat_1.ElementAt(j).user_name + "<br>") break; }
+        }
+    }
+    @if(yesterday.Count()>0) {<br />}
+    @if(twodaysago.Count()>0) {<p><strong>Przedwczoraj</strong></p>}
+    @for (int i = 0; i < twodaysago.Count(); i++)
+    {
+        for (int j = 0; j < walk_2.Count(); j++)
+        {
+            if (twodaysago[i] == walk_2.ElementAt(j).datetime.AddHours(2))
+            { @Html.Raw(twodaysago[i].ToString("HH:mm") + ": Spacer z " + walk_2.ElementAt(j).user_name + "<br>") break; }
+        }
+        for (int j = 0; j < eat_2.Count(); j++)
+        {
+            if (twodaysago[i] == eat_2.ElementAt(j).datetime.AddHours(2))
+            { @Html.Raw(twodaysago[i].ToString("HH:mm") + ": Karmienie z " + eat_2.ElementAt(j).user_name + "<br>") break; }
+        }
+    }
+</div>
+<div id="Notatki" style="display:none;margin-top:15px;">
+    <!--<h3>Notatki</h3>-->
+    <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6" style="padding-right:10px;padding-bottom:10px;">@Html.ActionLink("Dodaj notatkę", "AddNote", "Home", routeValues: new { id = Model.id }, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;" })</div>
+    </div>
+    @{ var note = Model.Note.OrderByDescending(x => x.datetime).ToList(); }
+    @for(int i=0; i<note.Count(); i++)
+    {
+        if (i == 0) { @Html.Raw("<p><strong>" + note.ElementAt(i).datetime.AddHours(2).ToString("dd.MM.yyyy") + "</strong></p>") }
+        else
+        {
+            if (note.ElementAt(i).datetime.AddHours(2).DayOfYear != note.ElementAt(i - 1).datetime.AddHours(2).DayOfYear) { @Html.Raw("</br><p><strong>" + note.ElementAt(i).datetime.AddHours(2).ToString("dd.MM.yyyy") + "</strong></p>") }
+        }
+        @Html.Raw(note.ElementAt(i).datetime.AddHours(2).ToString("HH:mm") + ": (" + note.ElementAt(i).user_name + ") " + note.ElementAt(i).nnote + " ") if (note.ElementAt(i).user_id == userid && note.ElementAt(i).datetime.AddMinutes(30) > DateTime.Now) { @Html.ActionLink("✘", "DelNote", "Home", routeValues: new { id = note.ElementAt(i).id, petid = Model.id }, htmlAttributes: new { @style = "color:#a00000;" }) } @Html.Raw("<br>")
+    }
+</div>
+<script>
+    function tab(i) {
+        if (i == 0) {
+            document.getElementById('Harmonogram').style.display = 'block';
+            document.getElementById('tab0').style.fontWeight = 'bold';
+            document.getElementById('tab0').classList.add('active');
+            document.getElementById('Notatki').style.display = 'none';
+            document.getElementById('tab1').style.fontWeight = 'normal';
+            document.getElementById('tab1').classList.remove('active');
+            document.getElementById('Wlasciciele').style.display = 'none';
+            document.getElementById('tab2').style.fontWeight = 'normal';
+            document.getElementById('tab2').classList.remove('active');
+        }
+        if (i == 1) {
+            document.getElementById('Harmonogram').style.display = 'none';
+            document.getElementById('tab0').style.fontWeight = 'normal';
+            document.getElementById('tab0').classList.remove('active');
+            document.getElementById('Notatki').style.display = 'block';
+            document.getElementById('tab1').style.fontWeight = 'bold';
+            document.getElementById('tab1').classList.add('active');
+            document.getElementById('Wlasciciele').style.display = 'none';
+            document.getElementById('tab2').style.fontWeight = 'normal';
+            document.getElementById('tab2').classList.remove('active');
+        }
+        if (i == 2) {
+            document.getElementById('Harmonogram').style.display = 'none';
+            document.getElementById('tab0').style.fontWeight = 'normal';
+            document.getElementById('tab0').classList.remove('active');
+            document.getElementById('Notatki').style.display = 'none';
+            document.getElementById('tab1').style.fontWeight = 'normal';
+            document.getElementById('tab1').classList.remove('active');
+            document.getElementById('Wlasciciele').style.display = 'block';
+            document.getElementById('tab2').style.fontWeight = 'bold';
+            document.getElementById('tab2').classList.add('active');
+        }
+    }
+    tab(0);
+</script>

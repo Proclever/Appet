@@ -1,0 +1,142 @@
+﻿@model IEnumerable<Appet.Models.UserPet>
+@{
+    ViewBag.Title = "Tablica";
+    var userid = ViewBag.Userid;
+    var userpet = Model.Where(x => x.user_id == userid).ToList();
+}
+
+<div style="padding-top:10px;">
+    @if (userpet.Where(x => x.isaccepted == false).Count() == 0)
+    {
+
+    }
+    else
+    {
+        <div>
+            @if (userpet.Where(x => x.isaccepted == false).Count() == 1)
+            { <p style="text-align:center;"><strong>Masz nowe zaproszenie</strong></p> }
+            else
+            { <p style="text-align:center;"><strong>Masz nowe zaproszenia (@Html.Raw(userpet.Where(x => x.isaccepted == false).Count().ToString()))</strong></p> }
+            @for (int i = 0; i < userpet.Where(x => x.isaccepted == false).Count(); i++)
+            {
+                <div style="background-color:#eeeeee;border-radius:5px;margin-bottom:5px;padding:10px;">
+                    <p style="text-align:center;">Użytkownik <strong>@Html.Raw(userpet.Where(x => x.isaccepted == false).ElementAt(i).Pet.UserPet.Where(x => x.ismain == true).First().user_name)</strong> zaprosił Cię do opieki nad pupilem <strong>@Html.Raw(userpet.Where(x => x.isaccepted == false).ElementAt(i).Pet.name)</strong>.</p>
+                    <div class="row">
+                        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6" style="padding-right:10px;padding-bottom:10px;">@Html.ActionLink("Akceptuj", "AcceptInv", "Home", routeValues: new { id = userpet.Where(x => x.isaccepted == false).ElementAt(i).id }, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;" })</div>
+                        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6" style="padding-right:10px;padding-bottom:10px;">@Html.ActionLink("Odrzuć", "CancelInv", "Home", routeValues: new { id = userpet.Where(x => x.isaccepted == false).ElementAt(i).id }, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;" })</div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    @if(userpet.Count() == 0)
+    {
+        <div>
+            <p style="text-align:center;">Nie dodałeś żadnego pupila i nie otrzymałeś jeszcze zaproszeń.</p>
+            <div class="row">
+                <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6 col-lg-offset-5 col-md-offset-4 col-sm-offset-4 col-xs-offset-3" style="padding-bottom:10px;">@Html.ActionLink("Dodaj pupila teraz", "AddPet", "Home", routeValues: null, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;" })</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        if (userpet.Where(x => x.isaccepted == true).Count() == 0)
+        {
+            <div class="row">
+                <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6 col-lg-offset-5 col-md-offset-4 col-sm-offset-4 col-xs-offset-3" style="padding-bottom:10px;">@Html.ActionLink("Dodaj pupila", "AddPet", "Home", routeValues: null, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;" })</div>
+            </div>
+        }
+        else
+        {
+            <div>
+                @if(userpet.Where(x => x.isaccepted == true).Count() == 1)
+                {
+                    <p style="text-align:center;"><strong>Twój pupil</strong></p>
+                }
+                else
+                {
+                    <p style="text-align:center;"><strong>Twoje pupile</strong></p>
+                }
+                @for(int i = 0; i < userpet.Where(x => x.isaccepted == true).Count(); i++)
+                {
+                    if (userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.name == null) { continue; }
+                    string hidewalk = "background: url(" + Url.Content("~/Content/Images/wyprowadz.png") + ") no-repeat;";
+                    if ((userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Walk.OrderByDescending(x => x.datetime).Count() > 0) && (userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Walk.OrderByDescending(x => x.datetime).First().datetime.AddMinutes(30) > DateTime.Now)) { hidewalk = "background: url(" + Url.Content("~/Content/Images/wyprowadzhide.png") + ") no-repeat;pointer-events:none;cursor:default;"; }
+                    string hideeat = "background: url(" + Url.Content("~/Content/Images/nakarm.png") + ") no-repeat;";
+                    if ((userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Eat.OrderByDescending(x => x.datetime).Count() > 0) && (userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Eat.OrderByDescending(x => x.datetime).First().datetime.AddMinutes(30) > DateTime.Now)) { hideeat = "background: url(" + Url.Content("~/Content/Images/nakarmhide.png") + ") no-repeat;pointer-events:none;cursor:default;"; }
+
+                    <div>
+                        <h3 style="text-align:center;"><strong>@Html.Raw(userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.name)</strong></h3>                        
+                        <div class="row">
+                            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 col-lg-offset-4 col-md-offset-4 col-sm-offset-3" style="padding-bottom:20px;">@Html.ActionLink("Wyprowadź", "WalkNow", "Home", routeValues: new { action2 = "Index", route = new { }, id = userpet.Where(x => x.isaccepted == true).ElementAt(i).pet_id }, htmlAttributes: new { @style = hidewalk + "display:block;background-size:100%;width:100%;height:0;padding-top:100%;text-indent:-9999px;" })</div>
+                            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6" style="padding-bottom:20px;">@Html.ActionLink("Nakarm", "EatNow", "Home", routeValues: new { action2 = "Index", route = new { }, id = userpet.Where(x => x.isaccepted == true).ElementAt(i).pet_id }, htmlAttributes: new { @style = hideeat +  "display:block;background-size:100%;width:100%;height:0;padding-top:100%;text-indent:-9999px;" })</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div id="walk" class="col-lg-2 col-md-2 col-sm-3 col-xs-6 col-lg-offset-4 col-md-offset-4 col-sm-offset-3">
+                                @if (userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Walk.ToList().Count() != 0)
+                                {
+                                    <p style="text-align:center;">
+                                        <strong>Ostatni spacer</strong><br />
+                                        @if (userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Walk.OrderByDescending(x => x.datetime).First().datetime.AddHours(2).DayOfYear == DateTime.Now.AddHours(2).DayOfYear)
+                                        {
+                                            @Html.Raw("Dziś o ")
+                                        }
+                                        else
+                                        {
+                                            if (userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Walk.OrderByDescending(x => x.datetime).First().datetime.AddHours(2).DayOfYear + 1 == DateTime.Now.AddHours(2).DayOfYear)
+                                            {
+                                                @Html.Raw("Wczoraj o ")
+                                            }
+                                            else
+                                            {
+                                                @Html.Raw((DateTime.Now.AddHours(2).DayOfYear - userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Walk.OrderByDescending(x => x.datetime).First().datetime.AddHours(2).DayOfYear).ToString() + " dni temu o ")
+                                            }
+                                        }
+                                        @Html.Raw(userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Walk.OrderByDescending(x => x.datetime).First().datetime.AddHours(2).ToString("HH:mm") + "<br />z " + userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Walk.OrderByDescending(x => x.datetime).First().user_name)
+                                    </p>
+                                }
+                            </div>
+                            <div id="eat" class="col-lg-2 col-md-2 col-sm-3 col-xs-6">
+                                @if (userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Eat.ToList().Count() != 0)
+                                {
+                                    <p style="text-align:center;">
+                                        <strong>Ostatnie karmienie</strong><br />
+                                        @if (userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Eat.OrderByDescending(x => x.datetime).First().datetime.AddHours(2).DayOfYear == DateTime.Now.AddHours(2).DayOfYear)
+                                        {
+                                            @Html.Raw("Dziś o ")
+                                        }
+                                        else
+                                        {
+                                            if (userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Eat.OrderByDescending(x => x.datetime).First().datetime.AddHours(2).DayOfYear + 1 == DateTime.Now.AddHours(2).DayOfYear)
+                                            {
+                                                @Html.Raw("Wczoraj o ")
+                                            }
+                                            else
+                                            {
+                                                @Html.Raw((DateTime.Now.AddHours(2).DayOfYear - userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Eat.OrderByDescending(x => x.datetime).First().datetime.AddHours(2).DayOfYear).ToString() + " dni temu o ")
+                                            }
+                                        }
+                                        @Html.Raw(userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Eat.OrderByDescending(x => x.datetime).First().datetime.AddHours(2).ToString("HH:mm") + "<br />z " + userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.Eat.OrderByDescending(x => x.datetime).First().user_name)
+                                    </p>
+                                }
+                            </div>                      
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 col-lg-offset-5 col-md-offset-5 col-sm-offset-4 col-xs-offset-3" style="padding-bottom:10px;padding-top:10px;">@Html.ActionLink("Szczegóły", "PetDetails", "Home", routeValues: new { id = userpet.Where(x => x.isaccepted == true).ElementAt(i).Pet.id }, htmlAttributes: new { @class = "btn btn-default btn-md", @style = "width:100%;font-weight:bold;" })</div>
+                        </div>
+                    </div>
+                    <hr />
+                }
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 col-lg-offset-5 col-md-offset-5 col-sm-offset-4 col-xs-offset-3" style="padding-bottom:10px;">@Html.ActionLink("Dodaj pupila", "AddPet", "Home", routeValues: null, htmlAttributes: new { @class = "btn btn-primary btn-md", @style = "width:100%;font-weight:bold;" })</div>
+            </div>
+        }
+    }
+</div>
+<hr />
+<footer>
+    <p style="text-align:center;">Appet &copy; @DateTime.Now.Year</p>
+    <p style="text-align:center;">Utworzone dla Ciebie przez <a href="http://proclever.pl"><strong>PROCLEVER</strong></a></p>
+</footer>
